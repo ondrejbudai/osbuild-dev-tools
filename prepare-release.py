@@ -53,7 +53,7 @@ def merge_specfiles(downstream: str, upstream: str, version: int, author: str):
     return "\n".join(merged_lines) + "\n"
 
 
-def main(package: str, url: str, version: int, author: str):
+def main(package: str, url: str, version: int, author: str, pkgtool: str):
     specfile = f"{package}.spec"
 
     # strip the ending /
@@ -72,13 +72,12 @@ def main(package: str, url: str, version: int, author: str):
     with open(specfile, "w") as f:
         f.write(new_downstream_specfile)
 
-    # TODO: support rhpkg
-    subprocess.check_call(["fedpkg", "new-sources", tarball])
+    subprocess.check_call([pkgtool, "new-sources", tarball])
     subprocess.check_call(["git", "add", ".gitignore", specfile, "sources"])
     subprocess.check_call(["git", "commit", "-m", f"Update to {version}"])
-    subprocess.check_call(["fedpkg", "scratch-build", "--srpm"])
+    subprocess.check_call([pkgtool, "scratch-build", "--srpm"])
     subprocess.check_call(["git", "push"])
-    subprocess.check_call(["fedpkg", "build"])
+    subprocess.check_call([pkgtool, "build"])
 
 
 if __name__ == "__main__":
@@ -89,7 +88,12 @@ if __name__ == "__main__":
     parser.add_argument("--version", metavar="VERSION", type=int, help="version to be released to downstream", required=True)
     parser.add_argument("--author", metavar="VERSION", type=str, help="author of the downstream change (format: Name Surname <email@example.com>", required=True)
     parser.add_argument("--release", metavar="VERSION", type=str, help="distribution release (f33, f32, master)", required=True)
+    parser.add_argument("--pkgtool", metavar="PKGTOOL", type=str, help="fedpkg or rhpkg", required=True)
     args = parser.parse_args()
+
+    if args.pkgtool not in ["fedpkg", "rhpkg"]:
+        raise RuntimeError("--pkgtool must be fedpkg or rhpkg!")
+
     with tempfile.TemporaryDirectory() as temp_dir:
         dir = path.join(temp_dir, args.package)
 
@@ -100,5 +104,6 @@ if __name__ == "__main__":
             args.package,
             args.url,
             args.version,
-            args.author
+            args.author,
+            args.pkgtool
         )
