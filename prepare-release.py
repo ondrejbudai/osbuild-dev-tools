@@ -55,5 +55,5 @@ if __name__ == "__main__":
 
         with chdir(dir):
             subprocess.check_call([args.pkgtool, "scratch-build", "--srpm"])
-            # subprocess.check_call(["git", "push"])
-            # subprocess.check_call([args.pkgtool, "build"])
+            subprocess.check_call(["git", "push"])
+            subprocess.check_call([args.pkgtool, "build"])
