@@ -13,7 +13,7 @@ def read_file(path) -> str:
         return f.read()
 
 
-def download_tarball(url: str, version: int, package: str) -> str:
+def download_tarball(url: str, version: str, package: str) -> str:
     tarball_path = f"{package}-{version}.tar.gz"
     urllib.request.urlretrieve(
         f"{url}/archive/v{version}.tar.gz",
@@ -30,7 +30,7 @@ def extracted_tarball(path: str):
         yield tempdir
 
 
-def merge_specfiles(downstream: str, upstream: str, version: int, author: str):
+def merge_specfiles(downstream: str, upstream: str, version: str, author: str):
     down_lines = downstream.splitlines()
     up_lines = upstream.splitlines()
 
@@ -52,7 +52,7 @@ def merge_specfiles(downstream: str, upstream: str, version: int, author: str):
     return "\n".join(merged_lines) + "\n"
 
 
-def update_distgit(package: str, url: str, version: int, author: str, pkgtool: str):
+def update_distgit(package: str, url: str, version: str, author: str, pkgtool: str):
     specfile = f"{package}.spec"
 
     # strip the ending /
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     parser.add_argument("--package", metavar="STRING", type=str, help="package name downstream", required=True)
     parser.add_argument("--url", metavar="URL", type=str, help="github url of the project", required=True)
     parser.add_argument("--distgit-checkout", metavar="DIR", type=str, help="distgit local checkout", required=True)
-    parser.add_argument("--version", metavar="VERSION", type=int, help="version to be released to downstream",
+    parser.add_argument("--version", metavar="VERSION", type=str, help="version to be released to downstream",
                         required=True)
     parser.add_argument("--author", metavar="VERSION", type=str,
                         help="author of the downstream change (format: Name Surname <email@example.com>", required=True)
