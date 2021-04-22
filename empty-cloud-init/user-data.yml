@@ -1,0 +1,7 @@
+#cloud-config
+user: admin
+password: foobar
+ssh_pwauth: True
+chpasswd:
+  expire: False
+sudo: 'ALL=(ALL) NOPASSWD:ALL'
